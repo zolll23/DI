@@ -4,13 +4,14 @@
 namespace VPA\DI;
 
 use Psr\Container\ContainerInterface;
+use ReflectionType;
 
 class Container implements ContainerInterface
 {
     static private array $containers = [];
     static private array $acceptors = [];
 
-    public function registerContainers()
+    public function registerContainers(): void
     {
         foreach (get_declared_classes() as $className) {
             $reflectionClass = new \ReflectionClass($className);
@@ -27,11 +28,11 @@ class Container implements ContainerInterface
                 }
             }
         }
-        var_dump(self::$containers);
     }
 
     private function prepareObject(string $className): object
     {
+        assert (class_exists($className));
         $classReflector = new \ReflectionClass($className);
 
         $constructReflector = $classReflector->getConstructor();
@@ -46,24 +47,24 @@ class Container implements ContainerInterface
 
         $args = [];
         foreach ($constructArguments as $argument) {
-            $argumentType = $argument->getType()->getName();
-            $args[$argument->getName()] = (new Container)->get($argumentType);
+            $argumentType = $argument->getType();
+            assert($argumentType instanceof ReflectionType);
+            $args[$argument->getName()] = (new Container)->get((string)$argumentType->getName());
         }
 
         return new $className(...$args);
     }
 
 
-    public function get($id)
+    public function get(string $id): mixed
     {
-        var_dump($id);
         if (!$this->has($id)) {
             throw new NotFoundException("Class $id with attribute Injectable not found. Check what class exists and attribute Injectable is set");
         }
         return self::$containers[$id];
     }
 
-    public function has($id)
+    public function has(string $id): bool
     {
         return isset(self::$containers[$id]);
     }

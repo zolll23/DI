@@ -26,7 +26,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 ADD docker.cfg/php.ini /usr/local/etc/php/php.ini
 
-WORKDIR /var/event_sourcing
+WORKDIR /var/di
 
 #RUN composer install --prefer-source --no-interaction
 

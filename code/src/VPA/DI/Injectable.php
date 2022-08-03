@@ -4,7 +4,7 @@
 namespace VPA\DI;
 
 #[\Attribute]
-abstract class Injectable
+class Injectable
 {
     function __construct(protected string $className)
     {
