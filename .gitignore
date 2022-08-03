@@ -1,0 +1,3 @@
+code/vendor/
+code/.phpunit.result.cache
+.idea/*
