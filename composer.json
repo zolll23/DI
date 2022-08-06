@@ -24,7 +24,7 @@
   },
   "autoload": {
     "psr-4": {
-      "VPA\\": "src/VPA"
+      "VPA\\": "code/src/VPA"
     }
   },
   "autoload-dev": {
