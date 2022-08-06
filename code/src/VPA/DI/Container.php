@@ -9,7 +9,6 @@ use ReflectionType;
 class Container implements ContainerInterface
 {
     static private array $containers = [];
-    static private array $acceptors = [];
 
     public function registerContainers(): void
     {
@@ -22,17 +21,21 @@ class Container implements ContainerInterface
                     case 'VPA\DI\Injectable':
                         self::$containers[$className] = $this->prepareObject($className);
                         break;
-                    case 'VPA\EventSourcing\Inject':
-                        self::$acceptors[$className] = $className;
-                        break;
                 }
             }
         }
     }
 
+    public function registerManually(array $classes)
+    {
+        foreach ($classes as $aliasName => $className) {
+            self::$containers[$aliasName] = $this->prepareObject($className);
+        }
+    }
+
     private function prepareObject(string $className): object
     {
-        assert (class_exists($className));
+        assert(class_exists($className));
         $classReflector = new \ReflectionClass($className);
 
         $constructReflector = $classReflector->getConstructor();
