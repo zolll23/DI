@@ -12,7 +12,18 @@ class Container implements ContainerInterface
 
     public function registerContainers(): void
     {
-        foreach (get_declared_classes() as $className) {
+        $classes = get_declared_classes();
+        $this->registerClasses(array_combine($classes, $classes));
+    }
+
+    public function registerManually(array $classes)
+    {
+        $this->registerClasses($classes);
+    }
+
+    private function registerClasses(array $classes)
+    {
+        foreach ($classes as $className) {
             $reflectionClass = new \ReflectionClass($className);
             $attributes = $reflectionClass->getAttributes();
             foreach ($attributes as $attribute) {
@@ -23,13 +34,6 @@ class Container implements ContainerInterface
                         break;
                 }
             }
-        }
-    }
-
-    public function registerManually(array $classes)
-    {
-        foreach ($classes as $aliasName => $className) {
-            self::$containers[$aliasName] = $this->prepareObject($className);
         }
     }
 
