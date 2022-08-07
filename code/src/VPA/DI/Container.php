@@ -11,10 +11,7 @@ class Container implements ContainerInterface
     private array $classes = [];
     static private array $containers = [];
 
-    function __construct(array $manualConfig = []) {
-        $classes = get_declared_classes();
-        $loadedClasses = array_slice(array_combine($classes, $classes),-5,5);
-        $this->classes = array_merge($loadedClasses,$manualConfig);
+    function __construct() {
     }
 
     public function getContainers(): array
@@ -22,8 +19,12 @@ class Container implements ContainerInterface
         return self::$containers;
     }
 
-    public function registerContainers()
+    public function registerContainers(array $manualConfig = [])
     {
+        $classes = get_declared_classes();
+        $loadedClasses = array_slice(array_combine($classes, $classes),-5,5);
+        $this->classes = array_merge($loadedClasses,$manualConfig);
+
         foreach ($this->classes as $aliasName => $className) {
             if (!class_exists($className)) {
                 throw new NotFoundException("VPA\DI\Container::registerClasses: Class $className not found");
@@ -73,6 +74,9 @@ class Container implements ContainerInterface
 
     public function get(string $alias): mixed
     {
+        if ($this->has($alias)) {
+            return self::$containers[$alias];
+        }
         $class = $this->classes[$alias] ?? $alias;
         $this->prepareObject($alias, $class);
         if (!$this->has($alias)) {
