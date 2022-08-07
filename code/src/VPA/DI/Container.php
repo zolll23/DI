@@ -22,7 +22,7 @@ class Container implements ContainerInterface
     public function registerContainers(array $manualConfig = [])
     {
         $classes = get_declared_classes();
-        $loadedClasses = array_slice(array_combine($classes, $classes),-5,5);
+        $loadedClasses = array_combine($classes, $classes);
         $this->classes = array_merge($loadedClasses,$manualConfig);
 
         foreach ($this->classes as $aliasName => $className) {
