@@ -41,8 +41,11 @@ class C {
 
 try {
     $di = new Container();
-    $di->registerContainers();
-    $b = $di->get(C::class);
+    $di->registerContainers([
+        'aaaa'=>'B'
+    ]);
+    $b = $di->get('aaaa',['num'=>12]);
+    //$b = $di->get(::class);
     $b->echo();
 } catch (Exception $e) {
     print($e->getMessage()."\n");

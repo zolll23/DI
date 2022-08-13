@@ -8,7 +8,7 @@ use ReflectionType;
 
 class Container implements ContainerInterface
 {
-    private array $classes = [];
+    private static array $classes = [];
 
     function __construct()
     {
@@ -16,11 +16,24 @@ class Container implements ContainerInterface
 
     public function registerContainers(array $manualConfig = [])
     {
+        $injectedClasses = [];
         $classes = get_declared_classes();
         $loadedClasses = array_combine($classes, $classes);
-        $this->classes = array_merge($loadedClasses, $manualConfig);
+        $classesNeedCheck = array_merge($loadedClasses, $manualConfig);
+        foreach ($classesNeedCheck as $alias => $class) {
+            $reflectionClass = new \ReflectionClass($class);
+            $attributes = $reflectionClass->getAttributes();
+            foreach ($attributes as $attribute) {
+                $typeOfEntity = $attribute->getName();
+                if ($typeOfEntity === 'VPA\DI\Injectable') {
+                    $injectedClasses[$alias]=$class;
+                }
+            }
+        }
 
-        foreach ($this->classes as $aliasName => $className) {
+        self::$classes = $injectedClasses;
+
+        foreach (self::$classes as $aliasName => $className) {
             if (!class_exists($className)) {
                 throw new NotFoundException("VPA\DI\Container::registerClasses: Class $className not found");
             }
@@ -73,12 +86,12 @@ class Container implements ContainerInterface
 
     public function get(string $alias, array $params = []): mixed
     {
-        $class = $this->classes[$alias] ?? $alias;
+        $class = self::$classes[$alias] ?? $alias;
         return $this->prepareObject($alias, $class, $params);
     }
 
     public function has(string $id): bool
     {
-        return isset(self::$containers[$id]);
+        return isset(self::$classes[$id]);
     }
 }
