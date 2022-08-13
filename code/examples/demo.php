@@ -20,11 +20,12 @@ class A {
 #[Injectable]
 class B {
 
-    function __construct(protected A $a) {
-        echo "\n-----\nA\n";
+    function __construct(protected A $a, private int $num) {
+        echo "\n-----\nB\n";
     }
     function echo () {
         $this->a->echo();
+        print("\nThis is Sparta! {$this->num}\n");
     }
 }
 
@@ -41,7 +42,7 @@ class C {
 try {
     $di = new Container();
     $di->registerContainers();
-    $b = $di->get(B::class);
+    $b = $di->get(C::class);
     $b->echo();
 } catch (Exception $e) {
     print($e->getMessage()."\n");

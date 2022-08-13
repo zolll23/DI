@@ -9,31 +9,25 @@ use ReflectionType;
 class Container implements ContainerInterface
 {
     private array $classes = [];
-    static private array $containers = [];
 
-    function __construct() {
-    }
-
-    public function getContainers(): array
+    function __construct()
     {
-        return self::$containers;
     }
 
     public function registerContainers(array $manualConfig = [])
     {
         $classes = get_declared_classes();
         $loadedClasses = array_combine($classes, $classes);
-        $this->classes = array_merge($loadedClasses,$manualConfig);
+        $this->classes = array_merge($loadedClasses, $manualConfig);
 
         foreach ($this->classes as $aliasName => $className) {
             if (!class_exists($className)) {
                 throw new NotFoundException("VPA\DI\Container::registerClasses: Class $className not found");
             }
-            $this->prepareObject($aliasName, $className);
         }
     }
 
-    private function prepareObject(string $aliasName, string $className)
+    private function prepareObject(string $aliasName, string $className, array $params = [])
     {
         assert(class_exists($className));
         $reflectionClass = new \ReflectionClass($className);
@@ -41,15 +35,14 @@ class Container implements ContainerInterface
         $attributes = $reflectionClass->getAttributes();
         foreach ($attributes as $attribute) {
             $typeOfEntity = $attribute->getName();
-            switch ($typeOfEntity) {
-                case 'VPA\DI\Injectable':
-                    self::$containers[$aliasName] = $this->getObject($className, $reflectionClass);
-                    break;
+            if ($typeOfEntity === 'VPA\DI\Injectable') {
+                return $this->getObject($className, $reflectionClass, $params);
             }
         }
+        throw new NotFoundException("VPA\DI\Container::get('$aliasName->$className'): Class with attribute Injectable not found. Check what class exists and attribute Injectable is set");
     }
 
-    private function getObject(string $className, \ReflectionClass $reflectionClass): object
+    private function getObject(string $className, \ReflectionClass $reflectionClass, array $params): object
     {
         $constructReflector = $reflectionClass->getConstructor();
         if (empty($constructReflector)) {
@@ -64,25 +57,24 @@ class Container implements ContainerInterface
         $args = [];
         foreach ($constructArguments as $argument) {
             $argumentType = $argument->getType();
+            $argumentName = (string)$argument->getName();
+            $argumentTypeName = (string)$argumentType->getName();
             assert($argumentType instanceof ReflectionType);
-            $args[$argument->getName()] = (new Container)->get((string)$argumentType->getName());
+            if (class_exists($argumentTypeName)) {
+                $args[$argumentName] = (new Container)->get($argumentTypeName);
+            } else {
+                $args[$argumentName] = $params[$argumentName];
+            }
         }
 
         return new $className(...$args);
     }
 
 
-    public function get(string $alias): mixed
+    public function get(string $alias, array $params = []): mixed
     {
-        if ($this->has($alias)) {
-            return self::$containers[$alias];
-        }
         $class = $this->classes[$alias] ?? $alias;
-        $this->prepareObject($alias, $class);
-        if (!$this->has($alias)) {
-            throw new NotFoundException("VPA\DI\Container::get('$alias->$class'): Class with attribute Injectable not found. Check what class exists and attribute Injectable is set");
-        }
-        return self::$containers[$alias];
+        return $this->prepareObject($alias, $class, $params);
     }
 
     public function has(string $id): bool
