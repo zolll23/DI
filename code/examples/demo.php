@@ -10,12 +10,12 @@ use VPA\DI\Injectable;
 class A
 {
 
-    function __construct()
+    public function __construct()
     {
         echo "\n-----\nA\n";
     }
 
-    function echo()
+    public function echo()
     {
         print("\nThis is Sparta!\n");
     }
@@ -26,12 +26,12 @@ class A
 class B
 {
 
-    function __construct(protected A $a, private int $num)
+    public function __construct(protected A $a, private int $num)
     {
         echo "\n-----\nB\n";
     }
 
-    function echo()
+    public function echo()
     {
         $this->a->echo();
         print("\nThis is Sparta! {$this->num}\n");
@@ -41,12 +41,12 @@ class B
 class C
 {
 
-    function __construct(protected A $a)
+    public function __construct(protected A $a)
     {
         echo "\n-----\nA\n";
     }
 
-    function echo()
+    public function echo()
     {
         $this->a->echo();
     }
