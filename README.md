@@ -1,6 +1,7 @@
 # DI
 
 [![Latest Stable Version](http://poser.pugx.org/vpa/di/v)](https://packagist.org/packages/vpa/di) [![Total Downloads](http://poser.pugx.org/vpa/di/downloads)](https://packagist.org/packages/vpa/di) [![Latest Unstable Version](http://poser.pugx.org/vpa/di/v/unstable)](https://packagist.org/packages/vpa/di) [![License](http://poser.pugx.org/vpa/di/license)](https://packagist.org/packages/vpa/di) [![PHP Version Require](http://poser.pugx.org/vpa/di/require/php)](https://packagist.org/packages/vpa/di)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/zolll23/DI/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/zolll23/DI/?branch=main)
 
 Simple Dependency Injection pattern implementation PSR-11 (Psr\Container\ContainerInterface) for PHP 8.x 
 
