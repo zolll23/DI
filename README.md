@@ -8,7 +8,9 @@ To specify the classes for which this pattern can be applied, attributes are use
 
 **Install**
 
+```
 composer require vpa/di
+```
 
 **Example**:
 
