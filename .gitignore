@@ -1,4 +1,4 @@
-code/vendor/
-code/.phpunit.*
+vendor/
+.phpunit.*
 .idea/*
 *.lock
