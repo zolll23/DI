@@ -49,3 +49,28 @@ try {
     print($e->getMessage()."\n");
 }
 ```
+
+You can add aliased classes manually, but the declaration of these classes must still have the #[Injecatble] tag.
+```
+$di = new Container();
+$di->registerContainers(['E'=>A::class]);
+$e = $di->get('E');
+echo $e instanceof A; // returns true
+```
+
+If your class has a constructor with parameters (and the types of those parameters are not an object) you can pass those parameters as the second parameter of the get method as an array:
+```
+#[Injectable]
+class A {
+    function __construct() {}
+}
+#[Injectable]
+class B {
+
+    function __construct(protected A $a, private int $x, private int $y) {}
+}
+
+$di = new Container();
+$di->registerContainers();
+$b = $di->get(B::class,['x'=>10,'y'=>20]);
+```
