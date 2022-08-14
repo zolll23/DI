@@ -26,12 +26,12 @@
   },
   "autoload": {
     "psr-4": {
-      "VPA\\": "code/src/VPA"
+      "VPA\\": "src/VPA"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "VPA\\": "code/tests"
+      "VPA\\": "tests"
     }
   },
   "scripts": {
