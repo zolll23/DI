@@ -1,4 +1,4 @@
 code/vendor/
-code/.phpunit.result.cache
+code/.phpunit.*
 .idea/*
 *.lock

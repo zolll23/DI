@@ -7,35 +7,47 @@ use VPA\DI\Container;
 use VPA\DI\Injectable;
 
 #[Injectable]
-class A {
+class A
+{
 
-    function __construct() {
+    function __construct()
+    {
         echo "\n-----\nA\n";
     }
-    function echo () {
+
+    function echo()
+    {
         print("\nThis is Sparta!\n");
     }
 
 }
 
 #[Injectable]
-class B {
+class B
+{
 
-    function __construct(protected A $a, private int $num) {
+    function __construct(protected A $a, private int $num)
+    {
         echo "\n-----\nB\n";
     }
-    function echo () {
+
+    function echo()
+    {
         $this->a->echo();
         print("\nThis is Sparta! {$this->num}\n");
     }
 }
 
-class C {
+class C
+{
 
-    function __construct(protected A $a) {
+    function __construct(protected A $a)
+    {
         echo "\n-----\nA\n";
     }
-    function echo () {
+
+    function echo()
+    {
         $this->a->echo();
     }
 }
@@ -43,11 +55,11 @@ class C {
 try {
     $di = new Container();
     $di->registerContainers([
-        'aaaa'=>'B'
+        'aaaa' => 'B'
     ]);
-    $b = $di->get('aaaa',['num'=>12]);
+    $b = $di->get('aaaa', ['num' => 12]);
     //$b = $di->get(::class);
     $b->echo();
 } catch (Exception $e) {
-    print($e->getMessage()."\n");
+    print($e->getMessage() . "\n");
 }

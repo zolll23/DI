@@ -22,7 +22,7 @@ class Container implements ContainerInterface
         $classesNeedCheck = array_merge($loadedClasses, $manualConfig);
         foreach ($classesNeedCheck as $alias => $class) {
             assert(is_string($class));
-            if(class_exists($class)) {
+            if (class_exists($class)) {
                 $reflectionClass = new \ReflectionClass($class);
                 $attributes = $reflectionClass->getAttributes();
                 foreach ($attributes as $attribute) {
