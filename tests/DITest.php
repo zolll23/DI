@@ -10,28 +10,25 @@ use VPA\DI\NotFoundException;
 
 #[Injectable]
 class A {
-
-    function __construct() {
-    }
 }
 
 #[Injectable]
 class B {
 
-    function __construct(protected A $a, private int $num) {
+    public function __construct(protected A $a, private int $num) {
     }
 }
 
 #[Injectable]
 class D {
 
-    function __construct(protected A $a) {
+    public function __construct(protected A $a) {
     }
 }
 
 class C {
 
-    function __construct(protected A $a) {
+    public function __construct(protected A $a) {
     }
 }
 
@@ -74,7 +71,7 @@ class DITest extends TestCase
     public function testInitClassWithoutAttributeInjection()
     {
         try {
-            $c = $this->di->get(C::class);
+            $this->di->get(C::class);
             $this->assertTrue(false);
         } catch (NotFoundException $e) {
             $this->assertTrue(true);

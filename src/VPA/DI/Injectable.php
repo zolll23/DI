@@ -7,7 +7,7 @@ namespace VPA\DI;
 #[\Attribute]
 class Injectable
 {
-    function __construct()
+    public function __construct()
     {
     }
 }
