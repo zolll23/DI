@@ -2,9 +2,11 @@
   "name": "vpa/di",
   "description": "The simple DI implementation for PHP 8.x with using Attributes #[Injectable]",
   "keywords": [
-    "php 8",
+    "php 8.x",
     "dependency",
-    "injection"
+    "injection",
+    "Attributes",
+    "Injectable"
   ],
   "license": "AGPL-3.0-or-later",
   "homepage": "https://github.com/zolll23/di",
