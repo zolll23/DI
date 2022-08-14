@@ -4,7 +4,6 @@
 namespace VPA\DI;
 
 use Psr\Container\ContainerInterface;
-use ReflectionType;
 
 class Container implements ContainerInterface
 {
@@ -14,33 +13,36 @@ class Container implements ContainerInterface
     {
     }
 
-    public function registerContainers(array $manualConfig = [])
+    public function registerContainers(array $manualConfig = []): void
     {
         $injectedClasses = [];
         $classes = get_declared_classes();
         $loadedClasses = array_combine($classes, $classes);
         $classesNeedCheck = array_merge($loadedClasses, $manualConfig);
         foreach ($classesNeedCheck as $alias => $class) {
-            $reflectionClass = new \ReflectionClass($class);
-            $attributes = $reflectionClass->getAttributes();
-            foreach ($attributes as $attribute) {
-                $typeOfEntity = $attribute->getName();
-                if ($typeOfEntity === 'VPA\DI\Injectable') {
-                    $injectedClasses[$alias]=$class;
+            assert(is_string($class));
+            if(class_exists($class)) {
+                $reflectionClass = new \ReflectionClass($class);
+                $attributes = $reflectionClass->getAttributes();
+                foreach ($attributes as $attribute) {
+                    $typeOfEntity = $attribute->getName();
+                    if ($typeOfEntity === 'VPA\DI\Injectable') {
+                        $injectedClasses[$alias] = $class;
+                    }
                 }
+            } else {
+                throw new NotFoundException("VPA\DI\Container::registerClasses: Class $class not found");
             }
         }
 
         self::$classes = $injectedClasses;
-
-        foreach (self::$classes as $aliasName => $className) {
-            if (!class_exists($className)) {
-                throw new NotFoundException("VPA\DI\Container::registerClasses: Class $className not found");
-            }
-        }
     }
 
-    private function prepareObject(string $aliasName, string $className, array $params = [])
+    /**
+     * @param array<array-key, mixed> $params
+     * @return object
+     */
+    private function prepareObject(string $aliasName, string $className, array $params = []): object
     {
         assert(class_exists($className));
         $reflectionClass = new \ReflectionClass($className);
@@ -55,6 +57,10 @@ class Container implements ContainerInterface
         throw new NotFoundException("VPA\DI\Container::get('$aliasName->$className'): Class with attribute Injectable not found. Check what class exists and attribute Injectable is set");
     }
 
+    /**
+     * @param array<array-key, mixed> $params
+     * @return object
+     */
     private function getObject(string $className, \ReflectionClass $reflectionClass, array $params): object
     {
         $constructReflector = $reflectionClass->getConstructor();
@@ -66,17 +72,16 @@ class Container implements ContainerInterface
         if (empty($constructArguments)) {
             return new $className;
         }
-
         $args = [];
         foreach ($constructArguments as $argument) {
             $argumentType = $argument->getType();
-            $argumentName = (string)$argument->getName();
-            $argumentTypeName = (string)$argumentType->getName();
-            assert($argumentType instanceof ReflectionType);
+            $argumentName = $argument->getName();
+            assert($argumentType instanceof \ReflectionNamedType);
+            $argumentTypeName = $argumentType->getName();
             if (class_exists($argumentTypeName)) {
-                $args[$argumentName] = (new Container)->get($argumentTypeName);
+                $args[$argumentName] = $this->get($argumentTypeName);
             } else {
-                $args[$argumentName] = $params[$argumentName];
+                $args[$argumentName] = $params[$argumentName] ?? null;
             }
         }
 
@@ -84,10 +89,11 @@ class Container implements ContainerInterface
     }
 
 
-    public function get(string $alias, array $params = []): mixed
+    public function get(string $id, array $params = []): object
     {
-        $class = self::$classes[$alias] ?? $alias;
-        return $this->prepareObject($alias, $class, $params);
+        $class = self::$classes[$id] ?? $id;
+        assert(is_string($class));
+        return $this->prepareObject($id, $class, $params);
     }
 
     public function has(string $id): bool
