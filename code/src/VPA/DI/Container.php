@@ -39,10 +39,6 @@ class Container implements ContainerInterface
         self::$classes = $injectedClasses;
     }
 
-    /**
-     * @param array<array-key, mixed> $params
-     * @return object
-     */
     private function prepareObject(string $aliasName, string $className, array $params = []): object
     {
         assert(class_exists($className));
@@ -58,10 +54,6 @@ class Container implements ContainerInterface
         throw new NotFoundException("VPA\DI\Container::get('$aliasName->$className'): Class with attribute Injectable not found. Check what class exists and attribute Injectable is set");
     }
 
-    /**
-     * @param array<array-key, mixed> $params
-     * @return object
-     */
     private function getObject(string $className, \ReflectionClass $reflectionClass, array $params): object
     {
         $constructReflector = $reflectionClass->getConstructor();
