@@ -1,8 +1,14 @@
 # DI
 
-Simple Dependency Injection pattern implementation for PHP 8.x
+[![Latest Stable Version](http://poser.pugx.org/vpa/di/v)](https://packagist.org/packages/vpa/di) [![Total Downloads](http://poser.pugx.org/vpa/di/downloads)](https://packagist.org/packages/vpa/di) [![Latest Unstable Version](http://poser.pugx.org/vpa/di/v/unstable)](https://packagist.org/packages/vpa/di) [![License](http://poser.pugx.org/vpa/di/license)](https://packagist.org/packages/vpa/di) [![PHP Version Require](http://poser.pugx.org/vpa/di/require/php)](https://packagist.org/packages/vpa/di)
+
+Simple Dependency Injection pattern implementation PSR-11 (Psr\Container\ContainerInterface) for PHP 8.x 
 
 To specify the classes for which this pattern can be applied, attributes are used, support for which was added to PHP 8.
+
+**Install**
+
+composer require vpa/di
 
 **Example**:
 
