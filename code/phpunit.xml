@@ -4,9 +4,12 @@
             <directory suffix="Test.php">tests</directory>
         </testsuite>
     </testsuites>
-    <coverage>
+    <coverage cacheDirectory=".phpunit.cache/code-coverage" processUncoveredFiles="true">
         <include>
             <directory suffix=".php">src</directory>
         </include>
+        <report>
+            <clover outputFile="clover.xml" />
+        </report>
     </coverage>
 </phpunit>
