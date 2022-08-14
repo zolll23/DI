@@ -35,7 +35,11 @@
     }
   },
   "scripts": {
-    "psalm": "vendor/bin/psalm --init",
-    "test": "vendor/bin/phpunit --coverage-clover clover.xml"
+    "static": "psalm",
+    "test": "phpunit --coverage-clover clover.xml",
+    "check": [
+      "@static",
+      "@test"
+    ]
   }
 }
