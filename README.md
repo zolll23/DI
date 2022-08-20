@@ -91,3 +91,19 @@ $di = new Container();
 $di->registerContainers();
 $b = $di->get(B::class,['x'=>10,'y'=>20]);
 ```
+
+**Bubble Propagation for attribute Injectable**
+
+In version 0.2.0 added method ```setBubblePropagation(bool $bubblePropogation)```
+(default is true) which specifies whether parent classes should be checked for the presence of an attribute _Injectable_. Еhis allows you to not set the attribute _Injectable_ to all children that should be DI.
+
+Example:
+```
+// In versions less 0.2.0 code below returns Exception, in version 0.2.0 and great - will return the desired class 
+#[Injectable]
+class A {}
+class B extends A {} // this class is not marked with the attribute Injectable
+$di = new Container();
+$di->registerContainers();
+$b = $di->get(B::class);
+```
