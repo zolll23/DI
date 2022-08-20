@@ -95,7 +95,7 @@ $b = $di->get(B::class,['x'=>10,'y'=>20]);
 **Bubble Propagation for attribute Injectable**
 
 In version 0.2.0 added method ```setBubblePropagation(bool $bubblePropogation)```
-(default is true) which specifies whether parent classes should be checked for the presence of an attribute _Injectable_. Еhis allows you to not set the attribute _Injectable_ to all children that should be DI.
+(default is true) which specifies whether parent classes should be checked for the presence of an attribute _Injectable_. This allows you to not set the attribute _Injectable_ to all children that should be DI.
 
 Example:
 ```
