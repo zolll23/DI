@@ -128,7 +128,7 @@ class Container implements ContainerInterface
             $argumentName = $argument->getName();
             assert($argumentType instanceof ReflectionNamedType);
             $argumentTypeName = $argumentType->getName();
-            if (class_exists($argumentTypeName)) {
+            if (class_exists($argumentTypeName) || interface_exists($argumentTypeName)) {
                 $args[$argumentName] = $this->get($argumentTypeName);
             } else {
                 $args[$argumentName] = $params[$argumentName] ?? null;
@@ -148,6 +148,7 @@ class Container implements ContainerInterface
 
     public function has(string $id): bool
     {
-        return (isset(self::$classes[$id]) || $this->isInjectable($id));
+        $class = self::$classes[$id] ?? $id;
+        return (isset(self::$classes[$id]) || $this->isInjectable($class));
     }
 }
