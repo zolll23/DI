@@ -9,9 +9,15 @@ use Psr\Container\ContainerInterface;
 class Container implements ContainerInterface
 {
     private static array $classes = [];
+    private static bool $bubblePropagation = true;
 
     function __construct()
     {
+    }
+
+    public function setBubblePropagation(bool $bubblePropagation): void
+    {
+        self::$bubblePropagation = $bubblePropagation;
     }
 
     public function registerContainers(array $manualConfig = []): void
@@ -23,39 +29,51 @@ class Container implements ContainerInterface
         foreach ($classesNeedCheck as $alias => $class) {
             assert(is_string($class));
             if (class_exists($class)) {
-                $reflectionClass = new \ReflectionClass($class);
-                $attributes = $reflectionClass->getAttributes();
-                foreach ($attributes as $attribute) {
-                    $typeOfEntity = $attribute->getName();
-                    if ($typeOfEntity === 'VPA\DI\Injectable') {
-                        $injectedClasses[$alias] = $class;
+                if ($this->classIsInjectable($class)) {
+                    $injectedClasses[$alias] = $class;
+                }
+                if (self::$bubblePropagation) {
+                    $parents = class_parents($class);
+                    foreach ($parents as $parent) {
+                        if ($this->classIsInjectable($parent)) {
+                            $injectedClasses[$alias] = $class;
+                            break;
+                        }
                     }
                 }
             } else {
                 throw new NotFoundException("VPA\DI\Container::registerClasses: Class $class not found");
             }
         }
-
         self::$classes = $injectedClasses;
     }
 
-    private function prepareObject(string $aliasName, string $className, array $params = []): object
+    private function classIsInjectable(string $class): bool
     {
-        assert(class_exists($className));
-        $reflectionClass = new \ReflectionClass($className);
-
+        assert(class_exists($class));
+        $reflectionClass = new \ReflectionClass($class);
         $attributes = $reflectionClass->getAttributes();
         foreach ($attributes as $attribute) {
             $typeOfEntity = $attribute->getName();
             if ($typeOfEntity === 'VPA\DI\Injectable') {
-                return $this->getObject($className, $reflectionClass, $params);
+                return true;
             }
+        }
+        return false;
+    }
+
+    private function prepareObject(string $aliasName, string $className, array $params = []): object
+    {
+        if ($this->has($className) || $this->classIsInjectable($className)) {
+            return $this->getObject($className, $params);
         }
         throw new NotFoundException("VPA\DI\Container::get('$aliasName->$className'): Class with attribute Injectable not found. Check what class exists and attribute Injectable is set");
     }
 
-    private function getObject(string $className, \ReflectionClass $reflectionClass, array $params): object
+    private function getObject(string $className, array $params): object
     {
+        assert(class_exists($className));
+        $reflectionClass = new \ReflectionClass($className);
         $constructReflector = $reflectionClass->getConstructor();
         if (empty($constructReflector)) {
             return new $className;

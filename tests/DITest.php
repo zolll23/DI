@@ -26,6 +26,9 @@ class D {
     }
 }
 
+class F extends D {
+}
+
 class C {
 
     public function __construct(protected A $a) {
@@ -51,7 +54,6 @@ class DITest extends TestCase
 
     public function testInitClassWithoutDependencies()
     {
-
         $a = $this->di->get(A::class);
         $this->assertTrue($a instanceof A);
     }
@@ -96,6 +98,21 @@ class DITest extends TestCase
         $di = new Container();
         $a = $di->get('\E');
         $this->assertTrue($a instanceof A);
+    }
+
+    public function testGetClassIfInjectableParentClass()
+    {
+        $di = new Container();
+        $a = $di->get(F::class);
+        $this->assertTrue($a instanceof F);
+    }
+
+    public function testGetClassIfInjectableParentClassWithDisabledBubblePropagation()
+    {
+        $di = new Container();
+        //$di->setBubblePropagation(false);
+        $a = $di->get(F::class);
+        $this->assertTrue($a instanceof F);
     }
 
 }

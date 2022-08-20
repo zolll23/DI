@@ -1,6 +1,6 @@
 <phpunit>
     <testsuites>
-        <testsuite name="event_listener">
+        <testsuite name="di">
             <directory suffix="Test.php">tests</directory>
         </testsuite>
     </testsuites>
