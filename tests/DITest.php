@@ -14,14 +14,12 @@ class A {
 
 #[Injectable]
 class B {
-
     public function __construct(protected A $a, private int $num) {
     }
 }
 
 #[Injectable]
 class D {
-
     public function __construct(protected A $a) {
     }
 }
@@ -29,8 +27,14 @@ class D {
 class F extends A {
 }
 
-class C {
+#[Injectable]
+interface H {
+}
 
+class I implements H {
+}
+
+class C {
     public function __construct(protected A $a) {
     }
 }
@@ -119,6 +123,23 @@ class DITest extends TestCase
     public function testHasNotInjectableClass()
     {
         $this->assertFalse($this->di->has(C::class));
+    }
+
+    public function testGetClassIfInjectableInterface()
+    {
+        $a = $this->di->get(I::class);
+        $this->assertTrue($a instanceof I);
+    }
+
+    public function testGetClassIfInjectableInterfaceWithDisabledBubblePropagation()
+    {
+        try {
+            $this->di->setBubblePropagation(false);
+            $a = $this->di->get(I::class);
+            $this->assertFalse($a instanceof I);
+        } catch (NotFoundException $e) {
+            $this->assertTrue(true);
+        }
     }
 
     public function testHasInjectableParentClassWithDisabledBubblePropagation()

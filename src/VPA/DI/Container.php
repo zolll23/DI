@@ -34,7 +34,7 @@ class Container implements ContainerInterface
         foreach ($classesNeedCheck as $alias => $class) {
             assert(is_string($class));
             if (class_exists($class)) {
-                if ($this->classIsInjectable($class)) {
+                if ($this->isInjectable($class)) {
                     $injectedClasses[$alias] = $class;
                 }
             } else {
@@ -49,10 +49,10 @@ class Container implements ContainerInterface
         $this->registerContainers(self::$manualConfig);
     }
 
-    private function classIsInjectable(string $class): bool
+    private function entityIsInjectable(string $entity): bool
     {
-        assert(class_exists($class));
-        $reflectionClass = new ReflectionClass($class);
+        assert(class_exists($entity) || interface_exists($entity));
+        $reflectionClass = new ReflectionClass($entity);
         $attributes = $reflectionClass->getAttributes();
         foreach ($attributes as $attribute) {
             $typeOfEntity = $attribute->getName();
@@ -60,12 +60,42 @@ class Container implements ContainerInterface
                 return true;
             }
         }
+        return false;
+    }
+
+    private function parentClassIsInjectable(string $class): bool
+    {
+        $parents = class_parents($class);
+        foreach ($parents as $parent) {
+            if ($this->entityIsInjectable($parent)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function interfaceIsInjectable(string $class): bool
+    {
+        $interfaces = class_implements($class);
+        foreach ($interfaces as $interface) {
+            if ($this->entityIsInjectable($interface)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function isInjectable(string $class): bool
+    {
+        if ($this->entityIsInjectable($class)) {
+            return true;
+        }
         if (self::$bubblePropagation) {
-            $parents = class_parents($class);
-            foreach ($parents as $parent) {
-                if ($this->classIsInjectable($parent)) {
-                    return true;
-                }
+            if ($this->parentClassIsInjectable($class)) {
+                return true;
+            }
+            if ($this->interfaceIsInjectable($class)) {
+                return true;
             }
         }
         return false;
@@ -73,7 +103,7 @@ class Container implements ContainerInterface
 
     private function prepareObject(string $aliasName, string $className, array $params = []): object
     {
-        if ($this->has($className) || $this->classIsInjectable($className)) {
+        if ($this->has($className) || $this->isInjectable($className)) {
             return $this->getObject($className, $params);
         }
         throw new NotFoundException("VPA\DI\Container::get('$aliasName->$className'): Class with attribute Injectable not found. Check what class exists and attribute Injectable is set");
@@ -118,6 +148,6 @@ class Container implements ContainerInterface
 
     public function has(string $id): bool
     {
-        return (isset(self::$classes[$id]) || $this->classIsInjectable($id));
+        return (isset(self::$classes[$id]) || $this->isInjectable($id));
     }
 }
