@@ -52,14 +52,19 @@ class C
     }
 }
 
+class D extends A {
+
+}
+
 try {
     $di = new Container();
     $di->registerContainers([
         'aaaa' => 'B'
     ]);
     $b = $di->get('aaaa', ['num' => 12]);
-    //$b = $di->get(::class);
     $b->echo();
+    $d = $di->get(D::class);
+    echo $d instanceof D ? "BubblePropagation is work" : "Library is old";
 } catch (Exception $e) {
     print($e->getMessage() . "\n");
 }
