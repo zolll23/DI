@@ -26,7 +26,7 @@ class D {
     }
 }
 
-class F extends D {
+class F extends A {
 }
 
 class C {
@@ -102,17 +102,40 @@ class DITest extends TestCase
 
     public function testGetClassIfInjectableParentClass()
     {
-        $di = new Container();
-        $a = $di->get(F::class);
+        $a = $this->di->get(F::class);
         $this->assertTrue($a instanceof F);
+    }
+
+    public function testHasInjectableClass()
+    {
+        $this->assertTrue($this->di->has(A::class));
+    }
+
+    public function testHasInjectableParentClass()
+    {
+        $this->assertTrue($this->di->has(F::class));
+    }
+
+    public function testHasNotInjectableClass()
+    {
+        $this->assertFalse($this->di->has(C::class));
+    }
+
+    public function testHasInjectableParentClassWithDisabledBubblePropagation()
+    {
+        $this->di->setBubblePropagation(false);
+        $this->assertFalse($this->di->has(C::class));
     }
 
     public function testGetClassIfInjectableParentClassWithDisabledBubblePropagation()
     {
-        $di = new Container();
-        //$di->setBubblePropagation(false);
-        $a = $di->get(F::class);
-        $this->assertTrue($a instanceof F);
+        try {
+            $this->di->setBubblePropagation(false);
+            $this->di->get(F::class);
+        } catch (NotFoundException $e) {
+            $this->assertTrue(true);
+        }
     }
+
 
 }

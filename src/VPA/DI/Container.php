@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace VPA\DI;
 
 use Psr\Container\ContainerInterface;
+use ReflectionClass;
+use ReflectionNamedType;
 
 class Container implements ContainerInterface
 {
     private static array $classes = [];
     private static bool $bubblePropagation = true;
+    private static array $manualConfig;
 
     function __construct()
     {
@@ -18,10 +21,12 @@ class Container implements ContainerInterface
     public function setBubblePropagation(bool $bubblePropagation): void
     {
         self::$bubblePropagation = $bubblePropagation;
+        $this->reloadContainers();
     }
 
     public function registerContainers(array $manualConfig = []): void
     {
+        self::$manualConfig = $manualConfig;
         $injectedClasses = [];
         $classes = get_declared_classes();
         $loadedClasses = array_combine($classes, $classes);
@@ -32,15 +37,6 @@ class Container implements ContainerInterface
                 if ($this->classIsInjectable($class)) {
                     $injectedClasses[$alias] = $class;
                 }
-                if (self::$bubblePropagation) {
-                    $parents = class_parents($class);
-                    foreach ($parents as $parent) {
-                        if ($this->classIsInjectable($parent)) {
-                            $injectedClasses[$alias] = $class;
-                            break;
-                        }
-                    }
-                }
             } else {
                 throw new NotFoundException("VPA\DI\Container::registerClasses: Class $class not found");
             }
@@ -48,15 +44,28 @@ class Container implements ContainerInterface
         self::$classes = $injectedClasses;
     }
 
+    private function reloadContainers(): void
+    {
+        $this->registerContainers(self::$manualConfig);
+    }
+
     private function classIsInjectable(string $class): bool
     {
         assert(class_exists($class));
-        $reflectionClass = new \ReflectionClass($class);
+        $reflectionClass = new ReflectionClass($class);
         $attributes = $reflectionClass->getAttributes();
         foreach ($attributes as $attribute) {
             $typeOfEntity = $attribute->getName();
             if ($typeOfEntity === 'VPA\DI\Injectable') {
                 return true;
+            }
+        }
+        if (self::$bubblePropagation) {
+            $parents = class_parents($class);
+            foreach ($parents as $parent) {
+                if ($this->classIsInjectable($parent)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -73,7 +82,7 @@ class Container implements ContainerInterface
     private function getObject(string $className, array $params): object
     {
         assert(class_exists($className));
-        $reflectionClass = new \ReflectionClass($className);
+        $reflectionClass = new ReflectionClass($className);
         $constructReflector = $reflectionClass->getConstructor();
         if (empty($constructReflector)) {
             return new $className;
@@ -87,7 +96,7 @@ class Container implements ContainerInterface
         foreach ($constructArguments as $argument) {
             $argumentType = $argument->getType();
             $argumentName = $argument->getName();
-            assert($argumentType instanceof \ReflectionNamedType);
+            assert($argumentType instanceof ReflectionNamedType);
             $argumentTypeName = $argumentType->getName();
             if (class_exists($argumentTypeName)) {
                 $args[$argumentName] = $this->get($argumentTypeName);
@@ -109,6 +118,6 @@ class Container implements ContainerInterface
 
     public function has(string $id): bool
     {
-        return isset(self::$classes[$id]);
+        return (isset(self::$classes[$id]) || $this->classIsInjectable($id));
     }
 }
