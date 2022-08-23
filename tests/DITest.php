@@ -9,29 +9,43 @@ use VPA\DI\Injectable;
 use VPA\DI\NotFoundException;
 
 #[Injectable]
-class A {
+class A
+{
 }
 
 #[Injectable]
-class B {
-
-    public function __construct(protected A $a, private int $num) {
+class B
+{
+    public function __construct(protected A $a, private int $num)
+    {
     }
 }
 
 #[Injectable]
-class D {
-
-    public function __construct(protected A $a) {
+class D
+{
+    public function __construct(protected A $a)
+    {
     }
 }
 
-class F extends A {
+class F extends A
+{
 }
 
-class C {
+#[Injectable]
+interface H
+{
+}
 
-    public function __construct(protected A $a) {
+class I implements H
+{
+}
+
+class C
+{
+    public function __construct(protected A $a)
+    {
     }
 }
 
@@ -48,8 +62,15 @@ class DITest extends TestCase
         parent::setUp();
         $this->di = new Container();
         $this->di->registerContainers([
-            '\E'=>A::class
+            '\E' => A::class,
+            'Tests\H' => I::class
         ]);
+    }
+
+    public function testInitAilasedInterface()
+    {
+        $a = $this->di->get('Tests\H');
+        $this->assertTrue($a instanceof I);
     }
 
     public function testInitClassWithoutDependencies()
@@ -66,7 +87,7 @@ class DITest extends TestCase
 
     public function testInitClassWithParams()
     {
-        $b = $this->di->get(B::class, ['num'=>10]);
+        $b = $this->di->get(B::class, ['num' => 10]);
         $this->assertTrue($b instanceof B);
     }
 
@@ -119,6 +140,23 @@ class DITest extends TestCase
     public function testHasNotInjectableClass()
     {
         $this->assertFalse($this->di->has(C::class));
+    }
+
+    public function testGetClassIfInjectableInterface()
+    {
+        $a = $this->di->get(I::class);
+        $this->assertTrue($a instanceof I);
+    }
+
+    public function testGetClassIfInjectableInterfaceWithDisabledBubblePropagation()
+    {
+        try {
+            $this->di->setBubblePropagation(false);
+            $a = $this->di->get(I::class);
+            $this->assertFalse($a instanceof I);
+        } catch (NotFoundException $e) {
+            $this->assertTrue(true);
+        }
     }
 
     public function testHasInjectableParentClassWithDisabledBubblePropagation()
