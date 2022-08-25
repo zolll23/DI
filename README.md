@@ -2,7 +2,6 @@
 
 [![Latest Stable Version](http://poser.pugx.org/vpa/di/v)](https://packagist.org/packages/vpa/di) 
 [![Total Downloads](http://poser.pugx.org/vpa/di/downloads)](https://packagist.org/packages/vpa/di) 
-[![Monthly Downloads](http://poser.pugx.org/vpa/di/d/monthly)](https://packagist.org/packages/vpa/di)
 [![Latest Unstable Version](http://poser.pugx.org/vpa/di/v/unstable)](https://packagist.org/packages/vpa/di) 
 [![License](http://poser.pugx.org/vpa/di/license)](https://packagist.org/packages/vpa/di) 
 [![PHP Version Require](http://poser.pugx.org/vpa/di/require/php)](https://packagist.org/packages/vpa/di)
