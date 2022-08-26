@@ -106,3 +106,15 @@ $di = new Container();
 $di->registerContainers();
 $b = $di->get(B::class);
 ```
+
+Similar to the previous point, DI supports bubble propagation for interfaces as well:
+
+```
+// In versions less 0.2.0 code below returns Exception, in version 0.2.0 and great - will return the desired class 
+#[Injectable]
+interface A {}
+class B implements A {} // this class is not marked with the attribute Injectable
+$di = new Container();
+$di->registerContainers();
+$b = $di->get(B::class);
+```
