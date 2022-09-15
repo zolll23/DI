@@ -54,16 +54,12 @@ class C {
     }
 }
 
-try {
-    $di = new Container();
-    $di->registerContainers();
-    $b = $di->get(B::class); // returns instance of class B
-    $b->echo();
-    $c = $di->get(C::class); // returns exception (class C not tagged as Injectable)
-    $c->echo();
-} catch (Exception $e) {
-    print($e->getMessage()."\n");
-}
+$di = new Container();
+$di->registerContainers();
+$b = $di->get(B::class); // returns instance of class B
+$b->echo();
+$c = $di->get(C::class); // returns exception (class C not tagged as Injectable)
+$c->echo();
 ```
 
 You can add aliased classes manually, but the declaration of these classes must still have the #[Injecatble] tag.
