@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1661039117">
-  <project timestamp="1661039117">
+<coverage generated="1663264674">
+  <project timestamp="1663264674">
     <file name="/var/di/src/VPA/DI/Container.php">
       <class name="VPA\DI\Container" namespace="global">
         <metrics complexity="34" methods="11" coveredmethods="9" conditionals="0" coveredconditionals="0" statements="62" coveredstatements="60" elements="73" coveredelements="69"/>
