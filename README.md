@@ -10,7 +10,7 @@
 [![Build Status](https://scrutinizer-ci.com/g/zolll23/DI/badges/build.png?b=main)](https://scrutinizer-ci.com/g/zolll23/DI/build-status/main)
 [![Code Intelligence Status](https://scrutinizer-ci.com/g/zolll23/DI/badges/code-intelligence.svg?b=main)](https://scrutinizer-ci.com/code-intelligence)
 
-Simple Dependency Injection pattern implementation PSR-11 (Psr\Container\ContainerInterface) for PHP 8.x 
+Dependency Injection pattern implementation PSR-11 (Psr\Container\ContainerInterface) for PHP 8.x 
 
 To specify the classes for which this pattern can be applied, attributes are used, support for which was added to PHP 8.
 
