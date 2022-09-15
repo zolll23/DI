@@ -13,6 +13,7 @@
 Dependency Injection pattern implementation PSR-11 (Psr\Container\ContainerInterface) for PHP 8.x 
 
 To specify the classes for which this pattern can be applied, attributes are used, support for which was added to PHP 8.
+This implementation allows you to fully control for which classes you can apply DI, just like Angular or NestJS does.
 
 **Install**
 
