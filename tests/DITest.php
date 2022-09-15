@@ -19,6 +19,11 @@ class B
     public function __construct(protected A $a, private int $num)
     {
     }
+
+    public function getNum(): int
+    {
+        return $this->num;
+    }
 }
 
 #[Injectable]
@@ -89,16 +94,14 @@ class DITest extends TestCase
     {
         $b = $this->di->get(B::class, ['num' => 10]);
         $this->assertTrue($b instanceof B);
+        $num = $b->getNum();
+        $this->assertTrue($num === 10);
     }
 
     public function testInitClassWithoutAttributeInjection()
     {
-        try {
-            $this->di->get(C::class);
-            $this->assertTrue(false);
-        } catch (NotFoundException $e) {
-            $this->assertTrue(true);
-        }
+        $this->expectException(NotFoundException::class);
+        $this->di->get(C::class);
     }
 
     public function testInitAilasedClass()
@@ -150,13 +153,10 @@ class DITest extends TestCase
 
     public function testGetClassIfInjectableInterfaceWithDisabledBubblePropagation()
     {
-        try {
-            $this->di->setBubblePropagation(false);
-            $a = $this->di->get(I::class);
-            $this->assertFalse($a instanceof I);
-        } catch (NotFoundException $e) {
-            $this->assertTrue(true);
-        }
+        $this->expectException(NotFoundException::class);
+        $this->di->setBubblePropagation(false);
+        $a = $this->di->get(I::class);
+        $this->assertFalse($a instanceof I);
     }
 
     public function testHasInjectableParentClassWithDisabledBubblePropagation()
@@ -167,12 +167,9 @@ class DITest extends TestCase
 
     public function testGetClassIfInjectableParentClassWithDisabledBubblePropagation()
     {
-        try {
-            $this->di->setBubblePropagation(false);
-            $this->di->get(F::class);
-        } catch (NotFoundException $e) {
-            $this->assertTrue(true);
-        }
+        $this->expectException(NotFoundException::class);
+        $this->di->setBubblePropagation(false);
+        $this->di->get(F::class);
     }
 
 

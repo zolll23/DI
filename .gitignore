@@ -1,6 +1,4 @@
 vendor/
 .phpunit.*
 .idea/*
-*.lock
-clover.xml
 clover.xml
