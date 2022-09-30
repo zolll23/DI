@@ -64,7 +64,6 @@ class K
 }
 
 
-
 class DITest extends TestCase
 {
     /**
@@ -78,8 +77,14 @@ class DITest extends TestCase
         $this->di = new Container();
         $this->di->registerContainers([
             '\E' => A::class,
-            'Tests\H' => I::class
+            'Tests\H' => I::class,
         ]);
+    }
+
+    public function testNotExistedClass()
+    {
+        $this->expectException(NotFoundException::class);
+        $this->di->get('notExist');
     }
 
     public function testInitAilasedInterface()
