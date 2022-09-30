@@ -54,9 +54,9 @@ class Container implements ContainerInterface
 
     private function entityIsInjectable(string $entity): bool
     {
-        assert(class_exists($entity) || interface_exists($entity));
         try {
-        $reflectionClass = new ReflectionClass($entity);
+            assert(class_exists($entity) || interface_exists($entity));
+            $reflectionClass = new ReflectionClass($entity);
         } catch (\ReflectionException $e) {
             throw new NotFoundException("VPA\DI\Container::registerClasses: Class $entity not found");
         }
