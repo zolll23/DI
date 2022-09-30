@@ -24,6 +24,10 @@ class Container implements ContainerInterface
         $this->reloadContainers();
     }
 
+    /**
+     * @param array $manualConfig
+     * @throws NotFoundException
+     */
     public function registerContainers(array $manualConfig = []): void
     {
         self::$manualConfig = $manualConfig;
@@ -53,32 +57,25 @@ class Container implements ContainerInterface
     {
         assert(class_exists($entity) || interface_exists($entity));
         $reflectionClass = new ReflectionClass($entity);
-        $attributes = $reflectionClass->getAttributes();
-        foreach ($attributes as $attribute) {
-            $typeOfEntity = $attribute->getName();
-            if ($typeOfEntity === 'VPA\DI\Injectable') {
-                return true;
-            }
-        }
-        return false;
+        return !empty($reflectionClass->getAttributes(Injectable::class));
     }
 
     private function parentClassIsInjectable(string $class): bool
     {
         $parents = class_parents($class);
-        foreach ($parents as $parent) {
-            if ($this->entityIsInjectable($parent)) {
-                return true;
-            }
-        }
-        return false;
+        return $this->checkInjectableTree($parents);
     }
 
     private function interfaceIsInjectable(string $class): bool
     {
         $interfaces = class_implements($class);
-        foreach ($interfaces as $interface) {
-            if ($this->entityIsInjectable($interface)) {
+        return $this->checkInjectableTree($interfaces);
+    }
+
+    private function checkInjectableTree(array $tree): bool
+    {
+        foreach ($tree as $branch) {
+            if ($this->entityIsInjectable($branch)) {
                 return true;
             }
         }

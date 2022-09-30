@@ -54,6 +54,16 @@ class C
     }
 }
 
+#[Injectable]
+class K
+{
+    // Constructor with empty params
+    public function __construct()
+    {
+    }
+}
+
+
 
 class DITest extends TestCase
 {
@@ -76,6 +86,12 @@ class DITest extends TestCase
     {
         $a = $this->di->get('Tests\H');
         $this->assertTrue($a instanceof I);
+    }
+
+    public function testInitClassWithEmptyConstructor()
+    {
+        $k = $this->di->get(K::class);
+        $this->assertTrue($k instanceof K);
     }
 
     public function testInitClassWithoutDependencies()
