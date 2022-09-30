@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace VPA\DI;
 
+use PHPUnit\Exception;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionNamedType;
@@ -41,8 +42,6 @@ class Container implements ContainerInterface
                 if ($this->isInjectable($class)) {
                     $injectedClasses[$alias] = $class;
                 }
-            } else {
-                throw new NotFoundException("VPA\DI\Container::registerClasses: Class $class not found");
             }
         }
         self::$classes = $injectedClasses;
@@ -56,7 +55,11 @@ class Container implements ContainerInterface
     private function entityIsInjectable(string $entity): bool
     {
         assert(class_exists($entity) || interface_exists($entity));
+        try {
         $reflectionClass = new ReflectionClass($entity);
+        } catch (\ReflectionException $e) {
+            throw new NotFoundException("VPA\DI\Container::registerClasses: Class $entity not found");
+        }
         return !empty($reflectionClass->getAttributes(Injectable::class));
     }
 
