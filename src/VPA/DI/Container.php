@@ -54,17 +54,14 @@ class Container implements ContainerInterface
 
     private function entityIsInjectable(string $entity): bool
     {
-        try {
-            assert(class_exists($entity) || interface_exists($entity));
-            $reflectionClass = new ReflectionClass($entity);
-        } catch (\ReflectionException $e) {
-            throw new NotFoundException("VPA\DI\Container::registerClasses: Class $entity not found");
-        }
+        assert(class_exists($entity) || interface_exists($entity));
+        $reflectionClass = new ReflectionClass($entity);
         return !empty($reflectionClass->getAttributes(Injectable::class));
     }
 
     private function parentClassIsInjectable(string $class): bool
     {
+
         $parents = class_parents($class);
         return $this->checkInjectableTree($parents);
     }
@@ -87,6 +84,9 @@ class Container implements ContainerInterface
 
     private function isInjectable(string $class): bool
     {
+        if (!class_exists($class)) {
+            throw new NotFoundException("VPA\DI\Container::registerClasses: Class $class not found");
+        }
         if ($this->entityIsInjectable($class)) {
             return true;
         }
