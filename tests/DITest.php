@@ -63,6 +63,14 @@ class K
     }
 }
 
+class Make
+{
+    public static function create(): K
+    {
+        return new K();
+    }
+}
+
 
 class DITest extends TestCase
 {
@@ -78,7 +86,14 @@ class DITest extends TestCase
         $this->di->registerContainers([
             '\E' => A::class,
             'Tests\H' => I::class,
+            'Exists' => Make::create(),
         ]);
+    }
+
+    public function testInitializatedClass()
+    {
+        $k = $this->di->get('Exists');
+        $this->assertTrue($k instanceof K);
     }
 
     public function testNotExistedClass()

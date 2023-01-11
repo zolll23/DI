@@ -1,6 +1,4 @@
-<?php
-declare(strict_types=1);
-
+<?php declare(strict_types=1);
 
 namespace VPA\DI;
 
@@ -37,11 +35,15 @@ class Container implements ContainerInterface
         $loadedClasses = array_combine($classes, $classes);
         $classesNeedCheck = array_merge($loadedClasses, $manualConfig);
         foreach ($classesNeedCheck as $alias => $class) {
-            assert(is_string($class));
-            if (class_exists($class)) {
-                if ($this->isInjectable($class)) {
-                    $injectedClasses[$alias] = $class;
+            if(is_string($class)) {
+                if (class_exists($class)) {
+                    if ($this->isInjectable($class)) {
+                        $injectedClasses[$alias] = $class;
+                    }
                 }
+            }
+            if(is_object($class)) {
+                $injectedClasses[$alias] = $class;
             }
         }
         self::$classes = $injectedClasses;
@@ -101,6 +103,9 @@ class Container implements ContainerInterface
         return false;
     }
 
+    /**
+     * @throws NotFoundException
+     */
     private function prepareObject(string $aliasName, string $className, array $params = []): object
     {
         if ($this->has($className) || $this->isInjectable($className)) {
@@ -142,8 +147,13 @@ class Container implements ContainerInterface
     public function get(string $id, array $params = []): object
     {
         $class = self::$classes[$id] ?? $id;
-        assert(is_string($class));
-        return $this->prepareObject($id, $class, $params);
+        if(is_string($class)) {
+            return $this->prepareObject($id, $class, $params);
+        }
+        if(is_object($class)) {
+            return self::$classes[$id];
+        }
+        throw new NotFoundException("VPA\DI\Container::get('$id'): Class not found");
     }
 
     public function has(string $id): bool
